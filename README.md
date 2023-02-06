@@ -16,8 +16,8 @@ chmod u+x ~/sui-install.sh
 
 ### 1. Download
 ```
-wget -O ~/sui-update.sh https://raw.githubusercontent.com/cyberomanov/sui-help/main/sui-update.sh && \
-chmod u+x ~/sui-update.sh
+wget -O ~/sui-update.sh https://raw.githubusercontent.com/bobu4/sui-help/main/sui-update.sh && \
+chmod +x ~/sui-update.sh ; ./sui-update.sh
 ```
 ### 2. Crontab
 1. Open crontab editor:
