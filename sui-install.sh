@@ -6,63 +6,63 @@ sudo apt install wget jq git libclang-dev libpq-dev cmake -y
 sudo curl https://sh.rustup.rs -sSf | sh -s -- -y && \
 source "$HOME/.cargo/env"
 
-cd $HOME && \
-mkdir -p $HOME/.sui; \
-rm -Rvf ~/sui; \
+cd /mnt/data && \
+mkdir -p /mnt/data/.sui; \
+rm -Rvf /mnt/data/sui; \
 git clone https://github.com/MystenLabs/sui
 
-cd ~/sui && \
+cd /mnt/data/sui && \
 git remote add upstream https://github.com/MystenLabs/sui; \
 git fetch upstream; \
 git checkout -B testnet --track upstream/testnet
 
-FIXED_CHECK=$(cat $HOME/sui/crates/sui-config/src/node.rs | grep "18080u16")
+FIXED_CHECK=$(cat /mnt/data/sui/crates/sui-config/src/node.rs | grep "18080u16")
 if [[ ${FIXED_CHECK} == "" ]]; then
     echo -e "\nfixing ports [node.rs]."
-    sed -i -e "s/8080u16/18080u16/g" $HOME/sui/crates/sui-config/src/node.rs && \
-    sed -i -e "s/9184/19184/g" $HOME/sui/crates/sui-config/src/node.rs && \
-    sed -i -e "s/9000/19000/g" $HOME/sui/crates/sui-config/src/node.rs && \
-    sed -i -e "s/9001/19001/g" $HOME/sui/crates/sui-config/src/node.rs && \
-    sed -i -e "s/1337/11337/g" $HOME/sui/crates/sui-config/src/node.rs
+    sed -i -e "s/8080u16/18080u16/g" /mnt/data/sui/crates/sui-config/src/node.rs && \
+    sed -i -e "s/9184/19184/g" /mnt/data/sui/crates/sui-config/src/node.rs && \
+    sed -i -e "s/9000/19000/g" /mnt/data/sui/crates/sui-config/src/node.rs && \
+    sed -i -e "s/9001/19001/g" /mnt/data/sui/crates/sui-config/src/node.rs && \
+    sed -i -e "s/1337/11337/g" /mnt/data/sui/crates/sui-config/src/node.rs
 else
     echo -e "\nports already fixed [node.rs]."
 fi && \
 
-FIXED_CHECK=$(cat $HOME/sui/crates/sui-config/src/swarm.rs | grep "18888")
+FIXED_CHECK=$(cat /mnt/data/sui/crates/sui-config/src/swarm.rs | grep "18888")
 if [[ ${FIXED_CHECK} == "" ]]; then
     echo -e "fixing ports [swarm.rs]."
-    sed -i -e "s/8888/18888/g" $HOME/sui/crates/sui-config/src/swarm.rs && \
-    sed -i -e "s/9000/19000/g" $HOME/sui/crates/sui-config/src/swarm.rs && \
-    sed -i -e "s/8084/18084/g" $HOME/sui/crates/sui-config/src/swarm.rs && \
-    sed -i -e "s/8080/18080/g" $HOME/sui/crates/sui-config/src/swarm.rs
+    sed -i -e "s/8888/18888/g" /mnt/data/sui/crates/sui-config/src/swarm.rs && \
+    sed -i -e "s/9000/19000/g" /mnt/data/sui/crates/sui-config/src/swarm.rs && \
+    sed -i -e "s/8084/18084/g" /mnt/data/sui/crates/sui-config/src/swarm.rs && \
+    sed -i -e "s/8080/18080/g" /mnt/data/sui/crates/sui-config/src/swarm.rs
 else
     echo -e "ports already fixed [swarm.rs]."
 fi && \
 
-FIXED_CHECK=$(cat $HOME/sui/crates/sui-config/src/p2p.rs | grep "18080")
+FIXED_CHECK=$(cat /mnt/data/sui/crates/sui-config/src/p2p.rs | grep "18080")
 if [[ ${FIXED_CHECK} == "" ]]; then
     echo -e "fixing ports [p2p.rs].\n"
-    sed -i -e "s/8080/18080/g" $HOME/sui/crates/sui-config/src/p2p.rs
+    sed -i -e "s/8080/18080/g" /mnt/data/sui/crates/sui-config/src/p2p.rs
 else
     echo -e "ports already fixed [p2p.rs].\n"
 fi
 
 cargo build --release
 
-mv $HOME/sui/target/release/{sui,sui-node,sui-faucet} /usr/bin/ && \
+mv /mnt/data/sui/target/release/{sui,sui-node,sui-faucet} /usr/bin/ && \
 cd
 
-wget -qO $HOME/.sui/genesis.blob https://github.com/MystenLabs/sui-genesis/raw/main/testnet/genesis.blob && \
-cp $HOME/sui/crates/sui-config/data/fullnode-template.yaml $HOME/.sui/fullnode.yaml
+wget -qO /mnt/data/.sui/genesis.blob https://github.com/MystenLabs/sui-genesis/raw/main/testnet/genesis.blob && \
+cp /mnt/data/sui/crates/sui-config/data/fullnode-template.yaml /mnt/data/.sui/fullnode.yaml
 
-sed -i -e "s%db-path:.*%db-path: \"$HOME/.sui/db\"%; "\
+sed -i -e "s%db-path:.*%db-path: \"/mnt/data/.sui/db\"%; "\
 "s%network-address:.*%network-address: \"/dns/localhost/tcp/18080/http\"%; "\
 "s%metrics-address:.*%metrics-address: \"0.0.0.0:19184\"%; "\
 "s%json-rpc-address:.*%json-rpc-address: \"0.0.0.0:19000\"%; "\
 "s%websocket-address:.*%websocket-address: \"0.0.0.0:19001\"%; "\
-"s%genesis-file-location:.*%genesis-file-location: \"$HOME/.sui/genesis.blob\"%; " $HOME/.sui/fullnode.yaml
+"s%genesis-file-location:.*%genesis-file-location: \"/mnt/data/.sui/genesis.blob\"%; " /mnt/data/.sui/fullnode.yaml
 
-sudo tee -a $HOME/.sui/fullnode.yaml  >/dev/null <<EOF
+sudo tee -a /mnt/data/.sui/fullnode.yaml  >/dev/null <<EOF
 
 p2p-config:
   seed-peers:
@@ -89,7 +89,7 @@ After=network-online.target
 [Service]
 User=$USER
 ExecStart=$(which sui-node) \\
---config-path $HOME/.sui/fullnode.yaml
+--config-path /mnt/data/.sui/fullnode.yaml
 Restart=on-failure
 RestartSec=3
 LimitNOFILE=65535
