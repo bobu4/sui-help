@@ -4,7 +4,7 @@
 
 ### 1. Download
 ```
-wget -O ~/sui-install.sh https://raw.githubusercontent.com/cyberomanov/sui-help/main/sui-install.sh && \
+wget -O ~/sui-install.sh https://raw.githubusercontent.com/bobu4/sui-help/main/sui-install.sh && \
 chmod u+x ~/sui-install.sh
 ```
 ### 2. Run
